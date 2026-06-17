@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unterrichtsmappen-Prompt-Generator V4.0</title>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --primary: #111827;
+      --accent: #2563eb;
+      --danger: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 24px 18px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+    header p {
+      margin: 8px 0 0;
+      color: #d1d5db;
+      font-size: 0.95rem;
+    }
+    main {
+      max-width: 1120px;
+      margin: 24px auto;
+      padding: 0 14px 40px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      margin-bottom: 18px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.15rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 14px;
+      margin-bottom: 5px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: white;
+    }
+    textarea {
+      min-height: 78px;
+      resize: vertical;
+    }
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+      margin-top: 8px;
+    }
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: normal;
+      margin: 0;
+      border: 1px solid var(--border);
+      padding: 8px;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    .check input { width: auto; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0;
+    }
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .primary { background: var(--accent); color: white; }
+    .secondary { background: #e5e7eb; color: var(--text); }
+    .danger { background: #fee2e2; color: var(--danger); }
+    #output {
+      min-height: 680px;
+      font-family: Consolas, Monaco, monospace;
+      white-space: pre-wrap;
+    }
+    .hint {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 6px;
+    }
+    .status {
+      font-size: 0.9rem;
+      color: var(--accent);
+      font-weight: bold;
+      min-height: 22px;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .checkbox-group { grid-template-columns: 1fr; }
+      header h1 { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Unterrichtsmappen-Prompt-Generator V4.0</h1>
+    <p>Erstellt einen vollständigen Master-Prompt für Lehrermappe, Schülermappe, Lösungsmappe und Qualitätsprüfung.</p>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="card">
+        <h2>1. Ausgangsdaten</h2>
+
+        <label for="fach">Fach</label>
+        <input id="fach" placeholder="z. B. Mathematik" />
+
+        <label for="thema">Thema</label>
+        <input id="thema" placeholder="z. B. Prozentrechnen" />
+
+        <label for="schulform">Schulform</label>
+        <select id="schulform">
+          <option value="">Bitte auswählen</option>
+          <option>Grundschule</option>
+          <option>Hauptschule</option>
+          <option>Werkrealschule</option>
+          <option>Realschule</option>
+          <option>Gemeinschaftsschule</option>
+          <option>Gymnasium</option>
+          <option>Berufsschule</option>
+          <option>Fachschule</option>
+          <option>Erwachsenenbildung</option>
+          <option>Unternehmensschulung</option>
+        </select>
+
+        <label for="klasse">Klassenstufe / Zielgruppe</label>
+        <input id="klasse" placeholder="z. B. Klasse 8" />
+
+        <label for="gruppe">Gruppengröße</label>
+        <input id="gruppe" placeholder="z. B. 25 Schüler" />
+
+        <label for="stunden">Anzahl Unterrichtsstunden</label>
+        <input id="stunden" placeholder="z. B. 1" />
+
+        <label for="dauer">Dauer je Unterrichtsstunde</label>
+        <input id="dauer" placeholder="z. B. 45 Minuten" />
+
+        <label for="lernstand">Lernstand</label>
+        <select id="lernstand">
+          <option value="">Bitte auswählen</option>
+          <option>Keine Vorkenntnisse</option>
+          <option>Grundlagen vorhanden</option>
+          <option>Fortgeschritten</option>
+          <option>Prüfungsvorbereitung</option>
+          <option>Sehr heterogene Lerngruppe</option>
+        </select>
+
+        <label for="vorwissen">Konkretes Vorwissen</label>
+        <textarea id="vorwissen" placeholder="z. B. keine besonderen Angaben"></textarea>
+
+        <label for="datum">Datum / Zeitraum</label>
+        <input id="datum" placeholder="z. B. 22.06.2026" />
+
+        <label for="lehrkraft">Lehrkraft</label>
+        <input id="lehrkraft" placeholder="z. B. Dipl.-Ing. G. Pellecchia" />
+      </section>
+
+      <section class="card">
+        <h2>2. Rahmenbedingungen</h2>
+
+        <label>Bevorzugte Unterrichtsformen</label>
+        <div class="checkbox-group" id="formen">
+          <label class="check"><input type="checkbox" value="Frontalunterricht">Frontalunterricht</label>
+          <label class="check"><input type="checkbox" value="Partnerarbeit">Partnerarbeit</label>
+          <label class="check"><input type="checkbox" value="Gruppenarbeit">Gruppenarbeit</label>
+          <label class="check"><input type="checkbox" value="Stationenlernen">Stationenlernen</label>
+          <label class="check"><input type="checkbox" value="Projektunterricht">Projektunterricht</label>
+          <label class="check"><input type="checkbox" value="Selbstständiges Lernen">Selbstständiges Lernen</label>
+          <label class="check"><input type="checkbox" value="Diskussion">Diskussion</label>
+          <label class="check"><input type="checkbox" value="Praktische Übungen">Praktische Übungen</label>
+        </div>
+
+        <label>Verfügbare Medien</label>
+        <div class="checkbox-group" id="medien">
+          <label class="check"><input type="checkbox" value="Tafel">Tafel</label>
+          <label class="check"><input type="checkbox" value="Whiteboard">Whiteboard</label>
+          <label class="check"><input type="checkbox" value="Smartboard">Smartboard</label>
+          <label class="check"><input type="checkbox" value="Beamer">Beamer</label>
+          <label class="check"><input type="checkbox" value="Tablets">Tablets</label>
+          <label class="check"><input type="checkbox" value="Computerraum">Computerraum</label>
+          <label class="check"><input type="checkbox" value="Smartphones">Smartphones</label>
+          <label class="check"><input type="checkbox" value="Labor / Werkstatt">Labor / Werkstatt</label>
+        </div>
+
+        <label>Besondere Anforderungen</label>
+        <div class="checkbox-group" id="anforderungen">
+          <label class="check"><input type="checkbox" value="Inklusion">Inklusion</label>
+          <label class="check"><input type="checkbox" value="Sprachförderung">Sprachförderung</label>
+          <label class="check"><input type="checkbox" value="Leistungsschwache Lerngruppe">Leistungsschwach</label>
+          <label class="check"><input type="checkbox" value="Leistungsstarke Lerngruppe">Leistungsstark</label>
+          <label class="check"><input type="checkbox" value="Heterogene Lerngruppe">Heterogen</label>
+          <label class="check"><input type="checkbox" value="Prüfungsvorbereitung">Prüfungsvorbereitung</label>
+          <label class="check"><input type="checkbox" value="Unruhige Klasse">Unruhige Klasse</label>
+          <label class="check"><input type="checkbox" value="Hoher Praxisbezug">Hoher Praxisbezug</label>
+        </div>
+
+        <label for="hinweise">Sonstige Hinweise</label>
+        <textarea id="hinweise" placeholder="Alles, was zusätzlich wichtig ist."></textarea>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>3. Feste Standards V4.0</h2>
+      <p>Diese Bestandteile werden automatisch in den Prompt geschrieben und müssen nicht mehr einzeln ausgewählt werden:</p>
+      <div class="checkbox-group">
+        <label class="check"><input type="checkbox" checked disabled>Lehrermappe</label>
+        <label class="check"><input type="checkbox" checked disabled>Schülermappe</label>
+        <label class="check"><input type="checkbox" checked disabled>Lösungsmappe</label>
+        <label class="check"><input type="checkbox" checked disabled>Differenzierung</label>
+        <label class="check"><input type="checkbox" checked disabled>Lernzielkontrolle</label>
+        <label class="check"><input type="checkbox" checked disabled>Bewertungsraster</label>
+        <label class="check"><input type="checkbox" checked disabled>Reserveaufgaben</label>
+        <label class="check"><input type="checkbox" checked disabled>Qualitätsprüfung</label>
+        <label class="check"><input type="checkbox" checked disabled>Unterrichts-Spickzettel</label>
+        <label class="check"><input type="checkbox" checked disabled>Notfallplan</label>
+        <label class="check"><input type="checkbox" checked disabled>Arbeitsblatt A/B/C</label>
+        <label class="check"><input type="checkbox" checked disabled>Klassenarbeit</label>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button class="primary" onclick="generatePrompt()">Prompt erstellen</button>
+      <button class="secondary" onclick="copyPrompt()">Prompt kopieren</button>
+      <button class="secondary" onclick="downloadPrompt()">Prompt als TXT speichern</button>
+      <button class="danger" onclick="clearForm()">Formular leeren</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <section class="card">
+      <h2>4. Fertiger Prompt</h2>
+      <textarea id="output" placeholder="Hier erscheint dein fertiger Prompt."></textarea>
+      <p class="hint">Diesen Prompt kopierst du anschließend in ChatGPT. Die Ausgabe ist auf vollständige Unterrichtsmappen ausgelegt.</p>
+    </section>
+  </main>
+
+<script>
+function val(id) {
+  return document.getElementById(id).value.trim();
+}
+function checkedValues(containerId) {
+  return Array.from(document.querySelectorAll('#' + containerId + ' input[type="checkbox"]:checked')).map(cb => cb.value);
+}
+function listOrDefault(arr) {
+  return arr.length ? arr.join(', ') : 'Keine besonderen Angaben.';
+}
+function textOrDefault(txt) {
+  return txt && txt.trim() ? txt.trim() : 'Keine besonderen Angaben.';
+}
+
+function generatePrompt() {
+  const fach = val('fach') || '[Fach eintragen]';
+  const thema = val('thema') || '[Thema eintragen]';
+  const schulform = val('schulform') || '[Schulform eintragen]';
+  const klasse = val('klasse') || '[Klassenstufe / Zielgruppe eintragen]';
+  const gruppe = val('gruppe') || '[Gruppengröße eintragen]';
+  const stunden = val('stunden') || '[Anzahl Unterrichtsstunden eintragen]';
+  const dauer = val('dauer') || '[Dauer je Unterrichtsstunde eintragen]';
+  const lernstand = val('lernstand') || '[Lernstand eintragen]';
+  const vorwissen = textOrDefault(val('vorwissen'));
+  const datum = val('datum') || '[Datum / Zeitraum eintragen]';
+  const lehrkraft = val('lehrkraft') || '[Lehrkraft eintragen]';
+  const formen = checkedValues('formen');
+  const medien = checkedValues('medien');
+  const anforderungen = checkedValues('anforderungen');
+  const hinweise = textOrDefault(val('hinweise'));
+
+  const prompt = `# MASTER-PROMPT UNTERRICHTSMAPPEN-GENERATOR PRO V4.0
+
+Du bist ein erfahrener Lehrer, Fachseminarleiter, Fachdidaktiker, Unterrichtsentwickler, Schulbuchautor und Prüfungsautor.
+
+Deine Aufgabe ist NICHT die Erstellung eines Unterrichtskonzeptes.
+
+Deine Aufgabe ist die Erstellung einer vollständig druckfertigen Unterrichtsmappe.
+
+Die Mappe muss unmittelbar im Unterricht einsetzbar sein.
+
+Der Schwerpunkt liegt auf fertigen Unterrichtsmaterialien, nicht auf Theorie.
+
+Die Ausgabe muss so erfolgen, dass sie direkt in Word übernommen werden kann.
+
+Mindestens 70 % des Gesamtumfangs müssen aus sofort einsetzbaren Unterrichtsmaterialien bestehen.
+
+Keine Meta-Erklärungen.
+
+Keine Hinweise wie:
+- „Sie könnten“
+- „Man könnte“
+- „Optional wäre“
+
+Stattdessen sind vollständige, direkt nutzbare Materialien zu erstellen.
+
+---
+
+# 1. AUSGANGSDATEN
+
+Fach: ${fach}
+Thema: ${thema}
+Schulform: ${schulform}
+Klassenstufe / Zielgruppe: ${klasse}
+Gruppengröße: ${gruppe}
+Anzahl Unterrichtsstunden: ${stunden}
+Dauer je Unterrichtsstunde: ${dauer}
+Lernstand: ${lernstand}
+Konkretes Vorwissen: ${vorwissen}
+Datum / Zeitraum: ${datum}
+Lehrkraft: ${lehrkraft}
+
+Bevorzugte Unterrichtsformen:
+${listOrDefault(formen)}
+
+Verfügbare Medien:
+${listOrDefault(medien)}
+
+Besondere Anforderungen:
+${listOrDefault(anforderungen)}
+
+Sonstige Hinweise:
+${hinweise}
+
+---
+
+# 2. AUTOMATISCH ZU ERSTELLENDE BESTANDTEILE
+
+Ohne Rückfrage immer erstellen:
+
+✓ Lehrermappe
+✓ Schülermappe
+✓ Lösungsmappe
+✓ Differenzierung
+✓ Lernzielkontrolle
+✓ Bewertungsraster
+✓ Reserveaufgaben
+✓ Qualitätsprüfung
+✓ Unterrichts-Spickzettel
+✓ Notfallplan
+✓ Arbeitsblatt A – Basisniveau
+✓ Arbeitsblatt B – Standardniveau
+✓ Arbeitsblatt C – Erweitertes Niveau
+✓ Hausaufgabenblatt
+✓ Klassenarbeit mit Musterlösung
+
+---
+
+# 3. AUSGABEREIHENFOLGE
+
+Die Ausgabe erfolgt immer in dieser Reihenfolge:
+
+1. Lehrermappe
+2. Schülermappe
+3. Lösungsmappe
+4. Qualitätsprüfung
+
+Keine andere Reihenfolge zulässig.
+
+---
+
+# 4. LEHRERMAPPE
+
+Erstelle eine vollständige Lehrermappe.
+
+## Deckblatt
+
+Enthält:
+- Fach
+- Thema
+- Schulform
+- Klassenstufe
+- Gruppengröße
+- Unterrichtsdauer
+- Datum
+- Lehrkraft
+
+## Inhaltsverzeichnis
+
+Automatisch erzeugen.
+
+## Didaktische Analyse
+
+Enthält:
+- Bedeutung des Themas
+- Lehrplanbezug
+- Lebensweltbezug
+- Berufsbezug
+- fachliche Voraussetzungen
+- Lernhürden
+- Motivationseinstieg
+- typische Fehlvorstellungen
+- typische Fehler
+
+## Lernziele
+
+### Fachkompetenz
+### Methodenkompetenz
+### Sozialkompetenz
+### Handlungskompetenz
+### Transferziel
+
+## Unterrichtsverlaufsplan
+
+Tabelle:
+
+| Zeit | Phase | Ziel | Lehreraktivität | Schüleraktivität | Material | Hinweise |
+
+Minutengenau planen.
+
+## Lehrerleitfaden
+
+Vollständig ausformuliert.
+
+Enthält:
+- Einstiegssatz
+- Aktivierungsfragen
+- Erklärungen
+- Beispiele
+- Übergänge
+- Kontrollfragen
+- Zusammenfassungen
+- Abschluss
+
+Wortwörtlich formulieren.
+
+## Erwartete Schülerantworten
+
+Zu allen wesentlichen Lehrerfragen.
+
+## Typische Schülerfragen
+
+Mit passenden Lehrerantworten.
+
+## Typische Schülerfehler
+
+Mit Korrekturhinweisen.
+
+## Unterrichtsstörungen
+
+Für jede Situation:
+
+### Beschreibung
+### Sofortreaktion
+### Präventivmaßnahme
+
+Mindestens:
+- Unruhe
+- fehlende Mitarbeit
+- Verständnisprobleme
+- zu schnelles Arbeiten
+
+## Reserveaufgaben
+
+Für schnelle Schülerinnen und Schüler.
+
+## Notfallplan
+
+### Wenn die Klasse schneller ist
+Zusätzliche Aufgaben.
+
+### Wenn die Klasse langsamer ist
+Kürzbare Inhalte.
+
+## Unterrichts-Spickzettel
+
+Maximal eine Seite.
+
+Enthält:
+- Lernziel
+- wichtigste Fachbegriffe
+- Formeln
+- typische Fragen
+- Antworten
+- Zeitplan
+
+## Tafelbild
+
+Vollständig.
+
+Druckfertig.
+
+Mit:
+- Überschrift
+- Merksatz
+- Beispiel
+- Rechenweg
+- Zusammenfassung
+
+---
+
+# 5. SCHÜLERMAPPE
+
+Erstelle eine vollständig druckfertige Schülermappe.
+
+Jedes Blatt enthält:
+
+Name: ______________________
+
+Datum: ______________________
+
+## Deckblatt
+
+## Merkblatt
+
+Altersgerecht.
+
+Einfach verständlich.
+
+## Arbeitsblatt A
+
+Basisniveau.
+
+## Arbeitsblatt B
+
+Standardniveau.
+
+## Arbeitsblatt C
+
+Erweitertes Niveau.
+
+## Hilfekarten
+
+Schritt-für-Schritt-Anleitungen.
+
+## Gruppenarbeitsblatt
+
+Falls methodisch sinnvoll.
+
+## Hausaufgabenblatt
+
+Immer erstellen.
+
+## Lernzielkontrolle
+
+Immer erstellen.
+
+Mit Punktzahl.
+
+## Klassenarbeit
+
+Immer erstellen.
+
+Mit:
+- Bearbeitungszeit
+- Punkteverteilung
+
+---
+
+# 6. LÖSUNGSMAPPE
+
+Separate Lösungsmappe.
+
+## Lösungen Merkblatt
+
+Falls erforderlich.
+
+## Lösungen Arbeitsblatt A
+
+Vollständig.
+
+## Lösungen Arbeitsblatt B
+
+Vollständig.
+
+## Lösungen Arbeitsblatt C
+
+Vollständig.
+
+## Lösungen Hausaufgabe
+
+Vollständig.
+
+## Lösungen Lernzielkontrolle
+
+Vollständig.
+
+## Lösungen Klassenarbeit
+
+Vollständig.
+
+## Bewertungsraster
+
+Mit Punkteschlüssel.
+
+## Erwartungshorizont
+
+Zu Lernzielkontrolle und Klassenarbeit.
+
+## Lehrerkommentare
+
+Typische Bewertungshinweise.
+
+---
+
+# 7. DIFFERENZIERUNG
+
+## Für schwächere Schüler
+
+- vereinfachte Aufgaben
+- Hilfekarten
+- Schritt-für-Schritt-Anleitungen
+- zusätzliche Beispiele
+
+## Für stärkere Schüler
+
+- Transferaufgaben
+- Vertiefungsaufgaben
+- Erweiterungsaufgaben
+- Praxisaufgaben
+
+---
+
+# 8. QUALITÄTSPRÜFUNG
+
+Prüfe die komplette Unterrichtsmappe kritisch.
+
+## Advocatus Diaboli
+
+Warum könnte die Stunde scheitern?
+
+## Schwachstellenanalyse
+
+Welcher Teil wird am ehesten Probleme verursachen?
+
+## Unbequeme Fragen
+
+Welche schwierigen Schülerfragen könnten auftreten?
+
+## Fachseminarleiter-Prüfung
+
+Welche Kritik könnte ein Fachseminarleiter äußern?
+
+## Praxischeck
+
+Ist die Stunde in der vorgegebenen Zeit realistisch?
+
+## Verbesserungsvorschläge
+
+Wie kann die Stunde verbessert werden?
+
+Wie kann sie vereinfacht werden?
+
+---
+
+# ABSCHLUSSREGEL
+
+Keine Platzhalter.
+
+Keine Kürzungen.
+
+Keine Verweise auf spätere Dokumente.
+
+Alle Materialien vollständig ausformulieren.
+
+Lieber 40 Seiten vollständige Unterrichtsunterlagen als 5 Seiten Theorie.`;
+
+  document.getElementById('output').value = prompt;
+  document.getElementById('status').innerText = 'Prompt wurde erstellt.';
+}
+
+async function copyPrompt() {
+  const output = document.getElementById('output');
+  if (!output.value.trim()) generatePrompt();
+  try {
+    await navigator.clipboard.writeText(output.value);
+    document.getElementById('status').innerText = 'Prompt wurde kopiert.';
+  } catch (err) {
+    output.select();
+    document.execCommand('copy');
+    document.getElementById('status').innerText = 'Prompt wurde markiert. Bitte ggf. manuell kopieren.';
+  }
+}
+
+function downloadPrompt() {
+  const output = document.getElementById('output');
+  if (!output.value.trim()) generatePrompt();
+  const blob = new Blob([output.value], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'unterrichtsmappen_prompt_v4.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  document.getElementById('status').innerText = 'TXT-Datei wurde erstellt.';
+}
+
+function clearForm() {
+  document.querySelectorAll('input[type="text"], input:not([type]), textarea').forEach(el => el.value = '');
+  document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+  document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+  document.getElementById('output').value = '';
+  document.getElementById('status').innerText = 'Formular wurde geleert.';
+}
+</script>
+</body>
+</html>
